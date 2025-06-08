@@ -1,0 +1,6 @@
+# HTML templates for profile generation will go here
+
+## Planned Templates:
+- profile-page.html (main athlete profile display)
+- profile-form.html (profile creation/editing form)
+- error-page.html (fallback for broken links) 

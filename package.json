@@ -1,0 +1,30 @@
+{
+  "name": "oneshot",
+  "version": "1.0.0",
+  "description": "OneShot - Modern monorepo for athlete profile generation",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\"",
+    "dev:api": "npm run dev --workspace=apps/api",
+    "dev:web": "npm run dev --workspace=apps/web",
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces",
+    "lint": "npm run lint --workspaces",
+    "health": "node scripts/simple-health.js",
+    "simplicity": "node scripts/simplicity-monitor.js",
+    "quick-check": "node scripts/quick-check.js",
+    "vercel:build": "npm run build --workspace=apps/web"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

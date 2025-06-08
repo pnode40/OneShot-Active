@@ -1,0 +1,46 @@
+{
+  "name": "oneshot-mvp",
+  "version": "1.1.0",
+  "description": "AI-generated athlete profile system with static generation",
+  "main": "oneshot-mvp/server/index.js",
+  "scripts": {
+    "start": "node oneshot-mvp/server/index.js",
+    "dev": "nodemon oneshot-mvp/server/index.js",
+    "dev:pm2": "pm2 start ecosystem.config.js",
+    "stop": "pm2 stop oneshot-mvp",
+    "restart": "pm2 restart oneshot-mvp",
+    "lint": "cd oneshot-mvp && npm run lint",
+    "test": "cd oneshot-mvp && npm run test",
+    "health": "cd oneshot-mvp && npm run health",
+    "simplicity": "cd oneshot-mvp && npm run simplicity",
+    "quick-check": "cd oneshot-mvp && npm run quick-check",
+    "health-check": "node scripts/system-health-check.js",
+    "effective-refactor-check": "node scripts/system-health-check.js",
+    "pre-session": "node scripts/pre-session-check.js",
+    "verify-boot-protocol": "node scripts/pre-session-check.js",
+    "feature-complete": "npm run effective-refactor-check && echo '\n🎯 Feature implementation complete. System integrity validated with Effective Refactor Mode.'"
+  },
+  "dependencies": {
+    "@sendgrid/mail": "^8.1.5",
+    "express": "^4.19.2",
+    "handlebars": "^4.7.8",
+    "multer": "^1.4.5-lts.1",
+    "pm2": "^5.4.0",
+    "qrcode": "^1.5.3",
+    "sharp": "^0.33.4",
+    "zod": "^3.25.56"
+  },
+  "devDependencies": {
+    "eslint": "^9.3.0",
+    "nodemon": "^3.1.0"
+  },
+  "keywords": [
+    "athlete",
+    "profile",
+    "generator",
+    "static",
+    "ai"
+  ],
+  "author": "OneShot AI Development Team",
+  "license": "MIT"
+} 

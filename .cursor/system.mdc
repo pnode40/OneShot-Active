@@ -1,0 +1,18 @@
+# OneShot MVP System Context - AI Governance & Integrity Enforcement
+
+## SESSION INITIALIZATION PROTOCOLS - MANDATORY
+
+### EVERY AI SESSION MUST BEGIN WITH:
+
+#### 1. System Health Verification
+REQUIRED CHECKS:
+- Read justified-over-budget.json (if exists) - refuse if any file >90% complexity
+- Read docs/features/IMPLEMENTED-FEATURES.md - verify current state
+- Check for system-lock.json (HARD BLOCKER if present)
+- Verify oneshot-mvp/ directory structure exists
+- Run scripts/effective-refactor-check.js for baseline
+- Only proceed if ALL checks pass
+
+FAILURE RESPONSE:
+If any check fails, STOP immediately and report specific issue
+No task execution until health is restored

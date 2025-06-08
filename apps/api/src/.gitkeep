@@ -1,0 +1,7 @@
+# Minimal API server will go here
+
+## Server Components:
+- app.js (main server setup)
+- auth.js (simple authentication)
+- profile-generator.js (JSON → HTML conversion)
+- file-handler.js (photo/transcript uploads) 

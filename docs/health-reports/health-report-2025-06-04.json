@@ -1,0 +1,43 @@
+{
+  "status": "CRITICAL",
+  "errors": [
+    "Missing required directory: server",
+    "Missing required file: server/index.js",
+    "7 endpoints documented but no router endpoints found in code"
+  ],
+  "warnings": [
+    "ESLint issues detected",
+    "Feature-Doc Sync: 0% - 7 endpoints documented, 0 implemented ()"
+  ],
+  "metrics": {
+    "complexity": {
+      "current": 0,
+      "budget": 2000,
+      "percentage": 0
+    },
+    "fileStructure": 65,
+    "linting": "Issues Found",
+    "serverStatus": "Unknown",
+    "processManager": "PM2 Not Available",
+    "featureDocSync": 0,
+    "featureDocDetails": {
+      "documentedEndpoints": 7,
+      "implementedEndpoints": 0,
+      "documentedSystems": 13,
+      "foundEndpoints": [
+        "POST /api/profile/generate",
+        "POST /api/upload",
+        "POST /api/contact",
+        "POST /api/auth/generate-token",
+        "POST /api/auth/authenticate"
+      ],
+      "routerFiles": []
+    },
+    "patternCompliance": 99,
+    "architectureAlignment": 55,
+    "modularization": "Needs Improvement",
+    "systemIntegrity": 51
+  },
+  "healthy": false,
+  "effectiveRefactorMode": true
+}

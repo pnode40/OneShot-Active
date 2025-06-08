@@ -1,0 +1,38 @@
+{
+  "name": "@oneshot/api",
+  "version": "1.0.0",
+  "description": "OneShot API - Express backend for athlete profile generation",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "nodemon src/index.js --ext js,json,env",
+    "start": "node src/index.js",
+    "build": "echo 'API build complete'",
+    "test": "jest --passWithNoTests",
+    "lint": "eslint src --ext .js --fix",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@sendgrid/mail": "^8.1.5",
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "compression": "^1.7.4",
+    "dotenv": "^16.5.0",
+    "handlebars": "^4.7.8",
+    "multer": "^1.4.5-lts.1",
+    "qrcode": "^1.5.3",
+    "sharp": "^0.33.4",
+    "zod": "^3.25.56",
+    "jsonwebtoken": "^9.0.2",
+    "express-rate-limit": "^7.1.0",
+    "express-async-errors": "^3.1.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0",
+    "eslint": "^9.3.0",
+    "jest": "^29.7.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "fullName": "Jordan Davis",
+  "jerseyNumber": "12",
+  "phone": "(555) 123-4567",
+  "email": "jordan.davis@email.com",
+  "sport": "Football",
+  "position": "Wide Receiver", 
+  "primaryPosition": "WR",
+  "secondaryPosition": "DB",
+  "highSchoolName": "Lincoln High School",
+  "state": "TX",
+  "year": 2025,
+  "graduationYear": 2025,
+  "height": "6'2\"",
+  "weight": 205,
+  "gpa": 3.8,
+  "jersey": "12",
+  "experience": "4 Years",
+  "photo": "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=300&fit=crop&crop=face",
+  "bio": "Dedicated wide receiver with exceptional route-running ability and reliable hands. Known for clutch performances in high-pressure situations and strong academic achievement. Committed to excellence both on the field and in the classroom.",
+  "performanceMetrics": {
+    "speedAgility": {
+      "verticalJump": 32,
+      "broadJump": "9'6\"",
+      "proAgility": "4.32"
+    },
+    "strengthPower": {
+      "benchPress": 225,
+      "squat": 315,
+      "deadlift": 405
+    }
+  },
+  "highlightVideoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+  "hudlVideoUrl": "https://hudl.com/video/example",
+  "twitter": "@jordandavis12",
+  "coachName": "Coach Mike Thompson",
+  "coachPhone": "(555) 987-6543",
+  "transcriptPdf": "/uploads/transcripts/jordan-davis-transcript.pdf",
+  "highlights": [
+    {
+      "title": "Season Highlights 2024",
+      "description": "Best catches and touchdowns from senior season including game-winning TD vs. Central High",
+      "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "thumbnail": "https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=300&h=200&fit=crop"
+    },
+    {
+      "title": "Combine Performance",
+      "description": "40-yard dash, vertical jump, and agility drills from regional combine",
+      "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "thumbnail": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop"
+    },
+    {
+      "title": "Championship Game",
+      "description": "Key plays from state championship game - 8 receptions, 150 yards, 2 TDs",
+      "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "thumbnail": "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=300&h=200&fit=crop"
+    }
+  ],
+  "achievements": [
+    {
+      "title": "All-State First Team",
+      "detail": "Selected for outstanding performance during 2024 season"
+    },
+    {
+      "title": "Team Captain",
+      "detail": "Elected by teammates and coaches for leadership qualities"
+    },
+    {
+      "title": "Academic All-Conference", 
+      "detail": "Maintained 3.8+ GPA while excelling in athletics"
+    },
+    {
+      "title": "Regional Combine MVP",
+      "detail": "Top performer at Nike Regional Combine - Dallas"
+    },
+    {
+      "title": "School Record Holder",
+      "detail": "Most receiving yards in a single season (1,247 yards)"
+    },
+    {
+      "title": "Playoff MVP",
+      "detail": "Outstanding performance in state playoff run"
+    }
+  ],
+  "coachQuote": {
+    "text": "Jordan is the most dedicated and talented receiver I've coached in 20 years. His work ethic, leadership, and clutch performances make him ready for the next level. Any college program would be lucky to have him.",
+    "author": "Coach Mike Thompson",
+    "title": "Head Coach, Lincoln High School"
+  },
+  "stats": {
+    "season2024": {
+      "receptions": 78,
+      "yards": 1247,
+      "touchdowns": 16,
+      "averagePerCatch": 16.0
+    }
+  },
+  "transcript": "/uploads/transcripts/jordan-davis-transcript.pdf",
+  "resume": "/uploads/resumes/jordan-davis-resume.pdf"
+} 
