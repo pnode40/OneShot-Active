@@ -18,9 +18,7 @@ app.use(helmet({
 }));
 
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://yourdomain.com', 'https://yourapp.vercel.app']
-    : ['http://localhost:3000', 'http://localhost:5173'],
+  origin: '*', // Allow all origins for now - update with specific domains in production later
   credentials: true
 }));
 
