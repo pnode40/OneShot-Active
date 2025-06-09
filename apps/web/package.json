@@ -11,8 +11,9 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
+    "@types/qrcode": "^1.5.5",
     "next": "15.3.3",
-    "qrcode.react": "^4.2.0",
+    "qrcode": "^1.5.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.57.0",

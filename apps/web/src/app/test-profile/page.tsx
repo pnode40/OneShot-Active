@@ -33,7 +33,7 @@ const testProfiles = [
     fortyTime: '4.38',
     verticalJump: '34"',
     benchPress: '205 lbs',
-    photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&h=300&fit=crop&crop=face',
+    photo: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=300&fit=crop&crop=face',
     highlights: 'https://youtube.com/watch?v=example2'
   }
 ]
@@ -41,186 +41,165 @@ const testProfiles = [
 export default function TestProfilePage() {
   const [selectedProfile, setSelectedProfile] = useState(testProfiles[0])
 
-  const profileUrl = typeof window !== 'undefined' ? `${window.location.origin}/athlete/${selectedProfile.id}` : ''
-
-  const generateVCard = () => {
+  const generateVCard = (profile: typeof testProfiles[0]) => {
     const vCard = `BEGIN:VCARD
 VERSION:3.0
-FN:${selectedProfile.fullName}
-TEL:${selectedProfile.jerseyNumber ? `Jersey #${selectedProfile.jerseyNumber}` : ''}
-EMAIL:${selectedProfile.fullName.toLowerCase().replace(' ', '.')}@example.com
-ORG:${selectedProfile.school}
-TITLE:${selectedProfile.position} - Class of ${selectedProfile.year}
-URL:${profileUrl}
-NOTE:Football Player Profile - OneShot Recruit
+FN:${profile.fullName}
+ORG:${profile.school}
+TITLE:${profile.position} #${profile.jerseyNumber}
+NOTE:Height: ${profile.height}, Weight: ${profile.weight}lbs, 40-yard: ${profile.fortyTime}s, Vertical: ${profile.verticalJump}, Bench: ${profile.benchPress}, GPA: ${profile.gpa}, Class of ${profile.year}
+URL:${profile.highlights}
 END:VCARD`
 
     const blob = new Blob([vCard], { type: 'text/vcard' })
     const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = `${selectedProfile.fullName.replace(' ', '_')}_contact.vcf`
+    link.download = `${profile.fullName.replace(/\s+/g, '_')}_football_profile.vcf`
+    document.body.appendChild(link)
     link.click()
+    document.body.removeChild(link)
     window.URL.revokeObjectURL(url)
   }
 
-  const shareProfile = async () => {
+  const shareProfile = () => {
     if (navigator.share) {
-      try {
-        await navigator.share({
-          title: `${selectedProfile.fullName} - Football Profile`,
-          text: `Check out ${selectedProfile.fullName}'s football profile`,
-          url: profileUrl
-        })
-      } catch (err) {
-        console.log('Share failed:', err)
-        // Fallback to copy to clipboard
-        copyToClipboard()
-      }
+      navigator.share({
+        title: `${selectedProfile.fullName} - Football Profile`,
+        text: `Check out ${selectedProfile.fullName}'s football profile - ${selectedProfile.position} #${selectedProfile.jerseyNumber} from ${selectedProfile.school}`,
+        url: window.location.href
+      })
     } else {
-      copyToClipboard()
+      navigator.clipboard.writeText(window.location.href)
+      alert('Profile link copied to clipboard!')
     }
   }
 
-  const copyToClipboard = () => {
-    navigator.clipboard?.writeText(profileUrl).then(() => {
-      alert('Profile URL copied to clipboard!')
-    }).catch(() => {
-      alert(`Copy this URL: ${profileUrl}`)
-    })
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-4 px-2">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-6">
-          <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-2">⚡ OneShot Team Testing</h1>
-          <p className="text-sm sm:text-lg text-gray-600">Quick athlete profile demo for the team</p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-4xl mx-auto px-4 py-4">
+          <h1 className="text-2xl font-bold text-gray-900">OneShot Team Testing</h1>
+          <p className="text-gray-600">Football recruitment profiles for testing</p>
         </div>
+      </div>
 
-        {/* Profile Selector - Mobile Optimized */}
-        <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 mb-4 sm:mb-6">
-          <h3 className="text-lg font-semibold mb-4">Select Test Profile:</h3>
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-            {testProfiles.map(profile => (
+      <div className="max-w-4xl mx-auto p-4 space-y-6">
+        {/* Player Selector */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-semibold mb-4">Select Test Player</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {testProfiles.map((profile) => (
               <button
                 key={profile.id}
                 onClick={() => setSelectedProfile(profile)}
-                className={`px-4 py-3 rounded-md font-medium transition text-center min-h-[48px] ${
-                  selectedProfile.id === profile.id 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300'
+                className={`p-4 rounded-lg border-2 transition-all text-left ${
+                  selectedProfile.id === profile.id
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:border-gray-300'
                 }`}
               >
-                {profile.fullName}
+                <div className="font-semibold">{profile.fullName}</div>
+                <div className="text-sm text-gray-600">
+                  {profile.position} #{profile.jerseyNumber} • {profile.school}
+                </div>
               </button>
             ))}
           </div>
         </div>
 
         {/* Profile Display */}
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          {/* Hero Section - Mobile Optimized */}
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-4 sm:p-8 text-center">
-            <div className="w-24 h-24 sm:w-32 sm:h-32 mx-auto mb-4 sm:mb-6 rounded-full overflow-hidden shadow-lg border-4 border-white">
-              <Image 
-                src={selectedProfile.photo} 
-                alt={selectedProfile.fullName}
-                width={128}
-                height={128}
-                className="w-full h-full object-cover"
-                priority
-              />
-            </div>
-            
-            <h1 className="text-xl sm:text-3xl font-bold mb-2">
-              {selectedProfile.fullName} #{selectedProfile.jerseyNumber}
-            </h1>
-            <p className="text-sm sm:text-xl mb-1">
-              {selectedProfile.height} • {selectedProfile.weight} lbs • {selectedProfile.gpa} GPA
-            </p>
-            <p className="text-sm sm:text-lg mb-1">
-              Class of {selectedProfile.year} • {selectedProfile.position}
-            </p>
-            <p className="text-sm sm:text-lg">
-              {selectedProfile.school}
-            </p>
-
-            {/* QR Code Placeholder */}
-            <div className="mt-4 sm:mt-6">
-              <div className="bg-white text-blue-600 px-4 py-2 rounded-md font-medium inline-block text-sm sm:text-base">
-                📱 QR Code (Coming Soon)
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          {/* Hero Section */}
+          <div className="bg-gradient-to-r from-blue-600 to-green-600 text-white p-6">
+            <div className="flex flex-col sm:flex-row items-center gap-6">
+              <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-lg flex-shrink-0">
+                <Image
+                  src={selectedProfile.photo}
+                  alt={selectedProfile.fullName}
+                  width={128}
+                  height={128}
+                  className="w-full h-full object-cover"
+                />
               </div>
-              <p className="text-xs sm:text-sm mt-2 opacity-75">QR functionality being optimized</p>
-            </div>
-          </div>
-
-          {/* Performance Stats - Mobile Grid */}
-          <div className="p-4 sm:p-8">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Performance Metrics</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-              <div className="bg-blue-50 p-4 rounded-lg text-center">
-                <h3 className="font-semibold text-gray-700 text-sm sm:text-base">40-Yard Dash</h3>
-                <p className="text-xl sm:text-2xl font-bold text-blue-600">{selectedProfile.fortyTime}s</p>
-              </div>
-              <div className="bg-green-50 p-4 rounded-lg text-center">
-                <h3 className="font-semibold text-gray-700 text-sm sm:text-base">Vertical Jump</h3>
-                <p className="text-xl sm:text-2xl font-bold text-green-600">{selectedProfile.verticalJump}</p>
-              </div>
-              <div className="bg-purple-50 p-4 rounded-lg text-center">
-                <h3 className="font-semibold text-gray-700 text-sm sm:text-base">Bench Press</h3>
-                <p className="text-xl sm:text-2xl font-bold text-purple-600">{selectedProfile.benchPress}</p>
+              <div className="text-center sm:text-left">
+                <h1 className="text-3xl font-bold">{selectedProfile.fullName}</h1>
+                <div className="text-xl opacity-90">#{selectedProfile.jerseyNumber} • {selectedProfile.position}</div>
+                <div className="text-lg opacity-80">{selectedProfile.school} • Class of {selectedProfile.year}</div>
               </div>
             </div>
           </div>
 
-          {/* Action Buttons - Mobile Stack */}
-          <div className="bg-gray-50 p-4 sm:p-6 border-t">
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:justify-center">
+          {/* Stats Section */}
+          <div className="p-6">
+            <h2 className="text-xl font-semibold mb-4">Performance Metrics</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+              <div className="bg-gray-50 p-3 rounded-lg text-center">
+                <div className="text-sm text-gray-600">Height</div>
+                <div className="font-semibold">{selectedProfile.height}</div>
+              </div>
+              <div className="bg-gray-50 p-3 rounded-lg text-center">
+                <div className="text-sm text-gray-600">Weight</div>
+                <div className="font-semibold">{selectedProfile.weight} lbs</div>
+              </div>
+              <div className="bg-gray-50 p-3 rounded-lg text-center">
+                <div className="text-sm text-gray-600">40-Yard</div>
+                <div className="font-semibold">{selectedProfile.fortyTime}s</div>
+              </div>
+              <div className="bg-gray-50 p-3 rounded-lg text-center">
+                <div className="text-sm text-gray-600">Vertical</div>
+                <div className="font-semibold">{selectedProfile.verticalJump}</div>
+              </div>
+              <div className="bg-gray-50 p-3 rounded-lg text-center">
+                <div className="text-sm text-gray-600">Bench</div>
+                <div className="font-semibold">{selectedProfile.benchPress}</div>
+              </div>
+              <div className="bg-gray-50 p-3 rounded-lg text-center">
+                <div className="text-sm text-gray-600">GPA</div>
+                <div className="font-semibold">{selectedProfile.gpa}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Actions Section */}
+          <div className="p-6 bg-gray-50 border-t">
+            <h2 className="text-xl font-semibold mb-4">Actions</h2>
+            <div className="flex flex-col sm:flex-row gap-3">
               <button
-                onClick={generateVCard}
-                className="bg-green-600 text-white px-4 sm:px-6 py-3 rounded-md font-medium hover:bg-green-700 active:bg-green-800 transition text-sm sm:text-base min-h-[48px]"
+                onClick={() => generateVCard(selectedProfile)}
+                className="flex-1 bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
               >
                 📱 Download Contact Card
+              </button>
+              <button
+                onClick={shareProfile}
+                className="flex-1 bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium"
+              >
+                🔗 Share Profile
               </button>
               <a
                 href={selectedProfile.highlights}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-red-600 text-white px-4 sm:px-6 py-3 rounded-md font-medium hover:bg-red-700 active:bg-red-800 transition text-center text-sm sm:text-base min-h-[48px] flex items-center justify-center"
+                className="flex-1 bg-purple-600 text-white px-4 py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium text-center"
               >
-                🎥 View Highlights
+                🎥 Watch Highlights
               </a>
-              <button
-                onClick={shareProfile}
-                className="bg-blue-600 text-white px-4 sm:px-6 py-3 rounded-md font-medium hover:bg-blue-700 active:bg-blue-800 transition text-sm sm:text-base min-h-[48px]"
-              >
-                📤 Share Profile
-              </button>
             </div>
           </div>
         </div>
 
-        {/* Testing Instructions - Mobile Friendly */}
-        <div className="mt-6 sm:mt-8 bg-yellow-50 border border-yellow-200 rounded-lg p-4 sm:p-6">
-          <h3 className="text-lg font-semibold text-yellow-800 mb-2">🧪 Mobile Testing Instructions</h3>
-          <ul className="text-yellow-700 space-y-1 text-sm sm:text-base">
-            <li>• Tap to switch between test profiles</li>
-            <li>• Test download contact cards</li>
-            <li>• Try share functionality (native mobile sharing)</li>
-            <li>• Check touch responsiveness</li>
-            <li>• Test in portrait and landscape</li>
-            <li>• QR codes will be added after initial testing</li>
+        {/* Testing Notes */}
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <h3 className="font-semibold text-yellow-800 mb-2">🏈 Team Testing Instructions</h3>
+          <ul className="text-yellow-700 space-y-1 text-sm">
+            <li>• Test profile switching between players</li>
+            <li>• Download contact cards on mobile devices</li>
+            <li>• Test share functionality</li>
+            <li>• Check mobile responsiveness</li>
+            <li>• Report any issues or feedback</li>
           </ul>
-          
-          {/* Network URL Display */}
-          <div className="mt-4 p-3 bg-blue-100 rounded-md">
-            <p className="text-blue-800 font-medium text-sm">📱 Share this URL with the team:</p>
-            <p className="text-blue-700 text-xs sm:text-sm font-mono break-all">
-              http://192.168.1.193:3000/test-profile
-            </p>
-          </div>
         </div>
       </div>
     </div>

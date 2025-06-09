@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { QRCodeSVG } from 'qrcode.react'
+import QRCode from 'qrcode'
 
 interface Profile {
   id: string
@@ -34,12 +34,15 @@ interface Profile {
     speedAgility?: {
       verticalJump?: number
       broadJump?: string | number
-      proAgility?: number
+      twentyYardShuttle?: number
+      threeConeDrill?: number
+      fortyYardDash?: number
     }
-    strengthPower?: {
+    strength?: {
       benchPress?: number
       squat?: number
       deadlift?: number
+      powerClean?: number
     }
   }
   // Legacy fields for backwards compatibility
@@ -62,18 +65,18 @@ interface ProfileResponse {
 
 // Mock data matching comprehensive-profile.json structure
 const mockProfile: Profile = {
-  id: "1",
+  id: "jordan-davis",
   fullName: "Jordan Davis",
   jerseyNumber: "12",
-  phone: "(555) 123-4567",
-  email: "jordan.davis@email.com",
-  primaryPosition: "WR",
-  secondaryPosition: "DB",
-  highSchoolName: "Lincoln High School",
-  state: "TX",
-  graduationYear: 2025,
   height: "6'2\"",
-  weight: 205,
+  weight: 185,
+  primaryPosition: "Wide Receiver",
+  secondaryPosition: "Safety",
+  highSchoolName: "Lincoln High School",
+  state: "CA",
+  graduationYear: 2025,
+  email: "jordan.davis@example.com",
+  phone: "(555) 123-4567",
   gpa: 3.8,
   photo: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=300&fit=crop&crop=face",
   bio: "Dedicated wide receiver with exceptional route-running ability and reliable hands. Known for clutch performances in high-pressure situations and strong academic achievement.",
@@ -82,12 +85,15 @@ const mockProfile: Profile = {
     speedAgility: {
       verticalJump: 32,
       broadJump: "9'6\"",
-      proAgility: 4.32
+      twentyYardShuttle: 4.32,
+      threeConeDrill: 6.8,
+      fortyYardDash: 4.4
     },
-    strengthPower: {
+    strength: {
       benchPress: 225,
       squat: 315,
-      deadlift: 405
+      deadlift: 405,
+      powerClean: 185
     }
   },
   highlightVideoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
@@ -130,6 +136,7 @@ function AthletePageClient({ slug }: { slug: string }) {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [qrCodeUrl, setQrCodeUrl] = useState<string>('')
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -171,6 +178,16 @@ function AthletePageClient({ slug }: { slug: string }) {
 
     fetchProfile()
   }, [slug])
+
+  useEffect(() => {
+    // Generate QR code
+    if (profile) {
+      const profileUrl = typeof window !== 'undefined' ? `${window.location.origin}/athlete/${profile.id}` : ''
+      QRCode.toDataURL(profileUrl, { width: 200, margin: 2 })
+        .then(url => setQrCodeUrl(url))
+        .catch(err => console.error('QR code generation failed:', err))
+    }
+  }, [profile])
 
   const generateVCard = () => {
     if (!profile) return
@@ -233,14 +250,6 @@ function AthletePageClient({ slug }: { slug: string }) {
     window.URL.revokeObjectURL(url)
   }
 
-  const copyProfileUrl = () => {
-    const profileUrl = `${window.location.origin}/athlete/${slug}`
-    navigator.clipboard.writeText(profileUrl).then(() => {
-      // You could add a toast notification here
-      console.log('Profile URL copied to clipboard')
-    })
-  }
-
   const extractYouTubeId = (url: string) => {
     const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)
     return match ? match[1] : null
@@ -263,16 +272,18 @@ function AthletePageClient({ slug }: { slug: string }) {
         <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-8">
           <div className="text-center">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-red-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
             </svg>
-            <h2 className="mt-4 text-xl font-bold text-gray-900">Profile Not Found</h2>
-            <p className="mt-2 text-gray-600">The athlete profile you&apos;re looking for doesn&apos;t exist or has been removed.</p>
-            <div className="mt-6 space-x-4">
-              <Link href="/dashboard" className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                Back to Dashboard
-              </Link>
-              <Link href="/" className="inline-block px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">
-                Back to Home
+            <h2 className="mt-4 text-xl font-semibold text-gray-900">Athlete Not Found</h2>
+            <p className="mt-2 text-gray-600">
+              {error || "We couldn't find the athlete profile you're looking for."}
+            </p>
+            <div className="mt-6">
+              <Link
+                href="/"
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Return Home
               </Link>
             </div>
           </div>
@@ -281,15 +292,13 @@ function AthletePageClient({ slug }: { slug: string }) {
     )
   }
 
-  const profileUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/athlete/${slug}`
-  
   // Extract performance data with fallbacks
   const verticalJump = profile.performanceMetrics?.speedAgility?.verticalJump || profile.vertical
   const broadJump = profile.performanceMetrics?.speedAgility?.broadJump || profile.broadJump
-  const proAgility = profile.performanceMetrics?.speedAgility?.proAgility || profile.proAgility
-  const benchPress = profile.performanceMetrics?.strengthPower?.benchPress || profile.benchPress
-  const squat = profile.performanceMetrics?.strengthPower?.squat || profile.squat
-  const deadlift = profile.performanceMetrics?.strengthPower?.deadlift || profile.deadlift
+  const twentyYardShuttle = profile.performanceMetrics?.speedAgility?.twentyYardShuttle || profile.proAgility
+  const benchPress = profile.performanceMetrics?.strength?.benchPress || profile.benchPress
+  const squat = profile.performanceMetrics?.strength?.squat || profile.squat
+  const deadlift = profile.performanceMetrics?.strength?.deadlift || profile.deadlift
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -355,21 +364,23 @@ function AthletePageClient({ slug }: { slug: string }) {
 
             {/* Line 5: QR Code */}
             <div className="mx-auto mt-4">
-              <div className="inline-block border rounded-lg p-2 shadow-sm bg-white">
-                <QRCodeSVG 
-                  value={profileUrl}
-                  size={120}
-                  level="M"
-                  includeMargin={true}
-                />
-              </div>
-              <p className="text-sm text-gray-600 mt-2 font-medium">Scan to View Profile</p>
-              <button
-                onClick={copyProfileUrl}
-                className="text-xs text-blue-600 hover:text-blue-800 mt-1 block mx-auto md:hidden"
-              >
-                Tap to copy profile URL
-              </button>
+              {qrCodeUrl ? (
+                <div className="bg-white p-4 rounded-lg shadow-lg">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img 
+                    src={qrCodeUrl} 
+                    alt="Profile QR Code" 
+                    className="w-32 h-32"
+                    width={128}
+                    height={128}
+                  />
+                  <p className="text-gray-600 text-sm mt-2">Scan to view profile</p>
+                </div>
+              ) : (
+                <div className="bg-white p-4 rounded-lg shadow-lg w-40 h-40 flex items-center justify-center">
+                  <p className="text-gray-600 text-sm">Loading QR...</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -482,10 +493,10 @@ function AthletePageClient({ slug }: { slug: string }) {
                       <span className="text-xl font-bold text-blue-600">{broadJump}</span>
                     </div>
                   )}
-                  {proAgility && (
+                  {twentyYardShuttle && (
                     <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                      <span className="font-medium text-gray-700">Pro Agility</span>
-                      <span className="text-xl font-bold text-blue-600">{proAgility}s</span>
+                      <span className="font-medium text-gray-700">20-Yard Shuttle</span>
+                      <span className="text-xl font-bold text-blue-600">{twentyYardShuttle}s</span>
                     </div>
                   )}
                 </div>
