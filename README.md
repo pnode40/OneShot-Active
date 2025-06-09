@@ -56,3 +56,4 @@ npm run dev:web    # Web only (port 3000)
 - `npm run test` - Run tests across all packages
 - `npm run lint` - Lint all packages
 - `npm run clean` - Clean all build artifacts
+ 

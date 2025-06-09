@@ -168,7 +168,7 @@ router.post('/', async (req, res) => {
     // Create a new profile with a unique ID
     const newId = (profiles.length + 1).toString();
     const slug = req.body.fullName ? req.body.fullName.toLowerCase().replace(/\s+/g, '-') : `profile-${newId}`;
-    
+
     const profileData = {
       id: newId,
       ...req.body,
@@ -264,6 +264,7 @@ router.get('/:id/qr', async (req, res) => {
     const qrCodeDataURL = await QRCode.toDataURL(profileUrl, qrOptions);
     
     // Generate QR code as buffer for potential file downloads
+    // eslint-disable-next-line no-unused-vars
     const qrCodeBuffer = await QRCode.toBuffer(profileUrl, qrOptions);
 
     res.json({

@@ -107,7 +107,7 @@ process.on('SIGTERM', () => {
   server.close(() => {
     console.log('Process terminated');
     process.exit(0);
-  });
+});
 });
 
 process.on('SIGINT', () => {
