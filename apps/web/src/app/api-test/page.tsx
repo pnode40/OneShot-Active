@@ -313,10 +313,13 @@ export default function APITestPage() {
               <strong>🎯 QR Code Generated!</strong>
               <div className="mt-3 bg-white rounded-lg p-4">
                 <div className="flex flex-col items-center space-y-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img 
                     src={qrCode.qrCode.dataURL} 
                     alt={`QR Code for ${qrCode.profile.name}`}
                     className="border-2 border-gray-300 rounded-lg"
+                    width={200}
+                    height={200}
                   />
                   <div className="text-center">
                     <p className="text-sm font-medium text-gray-800">{qrCode.profile.name}</p>
