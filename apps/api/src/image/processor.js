@@ -34,7 +34,7 @@ async function resizeImage(
 /**
  * Process uploaded image into multiple responsive sizes
  */
-async function processImage(imagePath, _athleteSlug) {
+async function processImage(imagePath) {
   const image = sharp(imagePath);
   const metadata = await image.metadata();
 

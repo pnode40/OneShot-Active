@@ -1,8 +1,5 @@
 const express = require('express');
-const { authenticateToken } = require('../auth');
 const { generateProfile, profileExists } = require('../profile-generator');
-const fs = require('fs').promises;
-const path = require('path');
 
 const router = express.Router();
 

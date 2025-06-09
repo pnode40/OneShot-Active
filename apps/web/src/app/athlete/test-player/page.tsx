@@ -1,10 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
-
 export default function TestPlayerPage() {
-  const router = useRouter()
-
   // No need for redirection as we're already at the correct route
   // The dynamic [slug] route will handle this path
 

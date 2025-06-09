@@ -2,6 +2,20 @@
 
 import React, { useState } from 'react';
 
+interface ApiResult {
+  message: string;
+  profile: {
+    id: string;
+    fullName: string;
+    primaryPosition: string;
+    highSchoolName: string;
+    graduationYear: number;
+    userId: string;
+    createdAt: string;
+    slug: string;
+  };
+}
+
 export default function APITestPage() {
   const [formData, setFormData] = useState({
     fullName: '',
@@ -10,7 +24,7 @@ export default function APITestPage() {
     graduationYear: 2024,
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<ApiResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {

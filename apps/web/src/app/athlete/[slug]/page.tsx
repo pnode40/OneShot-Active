@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { notFound } from 'next/navigation'
+import Link from 'next/link'
 
 interface Profile {
   id: string
@@ -74,10 +74,10 @@ export default function AthletePage({ params }: { params: { slug: string } }) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <h2 className="mt-4 text-xl font-bold text-gray-900">Profile Not Found</h2>
-            <p className="mt-2 text-gray-600">The athlete profile you're looking for doesn't exist or has been removed.</p>
-            <a href="/" className="mt-6 inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+            <p className="mt-2 text-gray-600">The athlete profile you&apos;re looking for doesn&apos;t exist or has been removed.</p>
+            <Link href="/" className="mt-6 inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
               Back to Home
-            </a>
+            </Link>
           </div>
         </div>
       </div>

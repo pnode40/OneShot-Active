@@ -6,7 +6,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
-const path = require('path');
+
 
 const app = express();
 const PORT = process.env.PORT || 5000; // Use port 5000 - completely clean port
@@ -62,7 +62,7 @@ app.use('*', (req, res) => {
 });
 
 // Global error handler
-app.use((error, req, res, next) => {
+app.use((error, req, res) => {
   console.error('Global error handler:', {
     error: error.message,
     stack: error.stack,

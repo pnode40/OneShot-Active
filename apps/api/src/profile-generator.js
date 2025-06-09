@@ -186,7 +186,8 @@ async function generateProfile(athleteData, baseUrl = 'http://localhost:3000') {
       template = handlebars.compile(templateSource);
     } catch (compileError) {
       console.error(
-        'Template compilation failed, re-registering helpers and retrying'
+        'Template compilation failed, re-registering helpers and retrying:',
+        compileError.message
       );
 
       // Emergency helper re-registration
