@@ -21,17 +21,32 @@ export default function APITestPage() {
     fullName: '',
     primaryPosition: '',
     highSchoolName: '',
-    graduationYear: 2024,
+    graduationYear: '',
   });
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<ApiResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Calculate completeness percentage
+  const calculateCompleteness = () => {
+    const fields = [
+      formData.fullName.trim(),
+      formData.primaryPosition,
+      formData.highSchoolName.trim(),
+      formData.graduationYear ? formData.graduationYear.toString() : ''
+    ];
+    
+    const filledFields = fields.filter(field => field !== '' && field !== '0').length;
+    return Math.round((filledFields / fields.length) * 100);
+  };
+
+  const completeness = calculateCompleteness();
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'graduationYear' ? parseInt(value) : value
+      [name]: name === 'graduationYear' ? (value ? parseInt(value) : '') : value
     }));
   };
 
@@ -42,13 +57,18 @@ export default function APITestPage() {
     setResult(null);
 
     try {
-      // Using the correct API port 4000
+      // Prepare form data with proper types
+      const submitData = {
+        ...formData,
+        graduationYear: formData.graduationYear ? parseInt(formData.graduationYear.toString()) : 2024
+      };
+
       const response = await fetch('http://localhost:5000/api/profiles', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(submitData),
       });
 
       if (!response.ok) {
@@ -73,6 +93,40 @@ export default function APITestPage() {
         {/* Form */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-xl font-semibold mb-4">Create New Profile</h2>
+          
+          {/* Completeness Meter */}
+          <div className="mb-6 p-4 bg-gray-50 rounded-lg border">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm font-medium text-gray-700">Profile Completeness</span>
+              <span className="text-sm font-bold text-blue-600">{completeness}%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-3">
+              <div 
+                className={`h-3 rounded-full transition-all duration-300 ease-out ${
+                  completeness < 25 ? 'bg-red-500' :
+                  completeness < 50 ? 'bg-orange-500' :
+                  completeness < 75 ? 'bg-yellow-500' :
+                  completeness < 100 ? 'bg-blue-500' :
+                  'bg-green-500'
+                }`}
+                style={{ width: `${completeness}%` }}
+              ></div>
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              {completeness === 100 ? (
+                <span className="text-green-600 font-medium">✅ Profile complete! Ready to submit.</span>
+              ) : completeness >= 75 ? (
+                <span className="text-blue-600">Almost there! Just a few more fields.</span>
+              ) : completeness >= 50 ? (
+                <span className="text-yellow-600">Good progress! Keep filling out your profile.</span>
+              ) : completeness >= 25 ? (
+                <span className="text-orange-600">Getting started! Fill out more details to increase visibility.</span>
+              ) : (
+                <span className="text-red-600">Start here! Complete your profile to improve recruiting chances.</span>
+              )}
+            </p>
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -142,6 +196,7 @@ export default function APITestPage() {
                 required
                 min="2020"
                 max="2030"
+                placeholder="e.g. 2024"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -169,17 +224,66 @@ export default function APITestPage() {
           {result && (
             <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
               <strong>Success!</strong> Profile created successfully.
-              <pre className="mt-2 text-sm overflow-auto">
-                {JSON.stringify(result, null, 2)}
-              </pre>
+              <div className="mt-3 space-y-2">
+                <div className="flex items-center justify-between bg-white bg-opacity-50 rounded p-2">
+                  <span className="font-medium">Profile ID: {result.profile.id}</span>
+                  <a 
+                    href={`/athlete/${result.profile.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition"
+                  >
+                    View Profile →
+                  </a>
+                </div>
+                <div className="flex items-center justify-between bg-white bg-opacity-50 rounded p-2">
+                  <span className="font-medium">Slug: {result.profile.slug}</span>
+                  <a 
+                    href={`/athlete/${result.profile.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition"
+                  >
+                    View by Slug →
+                  </a>
+                </div>
+              </div>
+              <details className="mt-3">
+                <summary className="cursor-pointer text-sm font-medium">Show JSON Response</summary>
+                <pre className="mt-2 text-xs overflow-auto bg-white bg-opacity-50 p-2 rounded">
+                  {JSON.stringify(result, null, 2)}
+                </pre>
+              </details>
             </div>
           )}
 
           <div className="text-sm text-gray-600 space-y-2">
             <h3 className="font-medium">API Reference:</h3>
             <p><strong>Endpoint:</strong> POST /api/profiles</p>
-                          <p><strong>Base URL:</strong> http://localhost:5000</p>
+            <p><strong>Base URL:</strong> http://localhost:5000</p>
             <p><strong>Expected Response:</strong> Profile object with ID</p>
+            
+            <div className="mt-4 pt-4 border-t border-gray-300">
+              <h3 className="font-medium mb-2">Existing Test Profiles:</h3>
+              <div className="space-y-1">
+                <a 
+                  href="/athlete/1" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="block text-blue-600 hover:text-blue-800 underline"
+                >
+                  Jordan Davis (ID: 1) →
+                </a>
+                <a 
+                  href="/athlete/2" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="block text-blue-600 hover:text-blue-800 underline"
+                >
+                  Riley Smith (ID: 2) →
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
