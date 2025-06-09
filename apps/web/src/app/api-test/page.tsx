@@ -16,6 +16,26 @@ interface ApiResult {
   };
 }
 
+interface QRCodeResult {
+  message: string;
+  profile: {
+    id: string;
+    name: string;
+    slug: string;
+  };
+  qrCode: {
+    dataURL: string;
+    profileUrl: string;
+    format: string;
+    size: string;
+    downloadUrl: string;
+  };
+  usage: {
+    description: string;
+    instructions: string;
+  };
+}
+
 export default function APITestPage() {
   const [formData, setFormData] = useState({
     fullName: '',
@@ -26,6 +46,8 @@ export default function APITestPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<ApiResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [qrCode, setQrCode] = useState<QRCodeResult | null>(null);
+  const [qrLoading, setQrLoading] = useState(false);
 
   // Calculate completeness percentage
   const calculateCompleteness = () => {
@@ -55,6 +77,7 @@ export default function APITestPage() {
     setIsLoading(true);
     setError(null);
     setResult(null);
+    setQrCode(null);
 
     try {
       // Prepare form data with proper types
@@ -81,6 +104,24 @@ export default function APITestPage() {
       setError(err instanceof Error ? err.message : 'Unknown error occurred');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const generateQRCode = async (profileId: string) => {
+    setQrLoading(true);
+    try {
+      const response = await fetch(`http://localhost:5000/api/profiles/${profileId}/qr`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const qrData = await response.json();
+      setQrCode(qrData);
+    } catch (err) {
+      setError(err instanceof Error ? `QR Generation Error: ${err.message}` : 'Failed to generate QR code');
+    } finally {
+      setQrLoading(false);
     }
   };
 
@@ -247,6 +288,16 @@ export default function APITestPage() {
                     View by Slug →
                   </a>
                 </div>
+                <div className="flex items-center justify-between bg-white bg-opacity-50 rounded p-2">
+                  <span className="font-medium">📱 QR Code</span>
+                  <button 
+                    onClick={() => generateQRCode(result.profile.id)}
+                    disabled={qrLoading}
+                    className="bg-purple-600 text-white px-3 py-1 rounded text-sm hover:bg-purple-700 transition disabled:bg-gray-400"
+                  >
+                    {qrLoading ? 'Generating...' : 'Generate QR →'}
+                  </button>
+                </div>
               </div>
               <details className="mt-3">
                 <summary className="cursor-pointer text-sm font-medium">Show JSON Response</summary>
@@ -254,6 +305,46 @@ export default function APITestPage() {
                   {JSON.stringify(result, null, 2)}
                 </pre>
               </details>
+            </div>
+          )}
+
+          {qrCode && (
+            <div className="bg-purple-100 border border-purple-400 text-purple-700 px-4 py-3 rounded mb-4">
+              <strong>🎯 QR Code Generated!</strong>
+              <div className="mt-3 bg-white rounded-lg p-4">
+                <div className="flex flex-col items-center space-y-3">
+                  <img 
+                    src={qrCode.qrCode.dataURL} 
+                    alt={`QR Code for ${qrCode.profile.name}`}
+                    className="border-2 border-gray-300 rounded-lg"
+                  />
+                  <div className="text-center">
+                    <p className="text-sm font-medium text-gray-800">{qrCode.profile.name}</p>
+                    <p className="text-xs text-gray-600">{qrCode.usage.description}</p>
+                    <p className="text-xs text-purple-600 mt-1">{qrCode.qrCode.profileUrl}</p>
+                  </div>
+                  <div className="flex space-x-2">
+                    <a 
+                      href={qrCode.qrCode.profileUrl}
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition"
+                    >
+                      Test Link →
+                    </a>
+                    <a 
+                      href={`http://localhost:5000${qrCode.qrCode.downloadUrl}`}
+                      download
+                      className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition"
+                    >
+                      Download QR ↓
+                    </a>
+                  </div>
+                </div>
+                <div className="mt-3 text-xs text-gray-500 border-t pt-2">
+                  <strong>Usage:</strong> {qrCode.usage.instructions}
+                </div>
+              </div>
             </div>
           )}
 

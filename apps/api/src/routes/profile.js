@@ -1,4 +1,5 @@
 const express = require('express');
+const QRCode = require('qrcode');
 const { generateProfile, profileExists } = require('../profile-generator');
 
 const router = express.Router();
@@ -227,6 +228,110 @@ router.post('/demo-comprehensive', async (req, res) => {
     res.status(500).json({
       error: 'Failed to generate demo profile',
       details: error.message,
+    });
+  }
+});
+
+// QR Code generation endpoint
+router.get('/:id/qr', async (req, res) => {
+  try {
+    const profile = profiles.find(p => p.id === req.params.id);
+    
+    if (!profile) {
+      return res.status(404).json({
+        error: 'Profile not found',
+        message: `No profile found with ID: ${req.params.id}`
+      });
+    }
+
+    // Determine the frontend URL for the profile
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const profileUrl = `${frontendUrl}/athlete/${profile.id}`;
+    
+    // QR code options for better quality
+    const qrOptions = {
+      type: 'png',
+      quality: 0.92,
+      margin: 1,
+      color: {
+        dark: '#000000',
+        light: '#FFFFFF'
+      },
+      width: 256
+    };
+
+    // Generate QR code as base64 data URL
+    const qrCodeDataURL = await QRCode.toDataURL(profileUrl, qrOptions);
+    
+    // Generate QR code as buffer for potential file downloads
+    const qrCodeBuffer = await QRCode.toBuffer(profileUrl, qrOptions);
+
+    res.json({
+      message: 'QR code generated successfully',
+      profile: {
+        id: profile.id,
+        name: profile.fullName,
+        slug: profile.slug
+      },
+      qrCode: {
+        dataURL: qrCodeDataURL,
+        profileUrl: profileUrl,
+        format: 'PNG',
+        size: '256x256',
+        downloadUrl: `/api/profiles/${profile.id}/qr/download`
+      },
+      usage: {
+        description: 'Scan this QR code to view the athlete profile',
+        instructions: 'Point your phone camera or QR scanner at the code'
+      }
+    });
+  } catch (error) {
+    console.error('QR code generation error:', error);
+    res.status(500).json({
+      error: 'Failed to generate QR code',
+      message: error.message
+    });
+  }
+});
+
+// QR Code download endpoint (returns actual image file)
+router.get('/:id/qr/download', async (req, res) => {
+  try {
+    const profile = profiles.find(p => p.id === req.params.id);
+    
+    if (!profile) {
+      return res.status(404).json({
+        error: 'Profile not found'
+      });
+    }
+
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const profileUrl = `${frontendUrl}/athlete/${profile.id}`;
+    
+    const qrOptions = {
+      type: 'png',
+      quality: 0.92,
+      margin: 1,
+      color: {
+        dark: '#000000',
+        light: '#FFFFFF'
+      },
+      width: 512 // Higher resolution for download
+    };
+
+    const qrCodeBuffer = await QRCode.toBuffer(profileUrl, qrOptions);
+    
+    // Set proper headers for image download
+    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Content-Disposition', `attachment; filename="qr-code-${profile.slug}.png"`);
+    res.setHeader('Content-Length', qrCodeBuffer.length);
+    
+    res.send(qrCodeBuffer);
+  } catch (error) {
+    console.error('QR code download error:', error);
+    res.status(500).json({
+      error: 'Failed to download QR code',
+      message: error.message
     });
   }
 });
