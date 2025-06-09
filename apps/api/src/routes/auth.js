@@ -14,4 +14,19 @@ router.get('/me', authenticateToken, (req, res) => {
   });
 });
 
+// Mock authentication endpoint
+router.post('/login', (req, res) => {
+  // This is a simplified mock - in a real app, you'd verify credentials
+  const token = 'mock-jwt-token-for-testing';
+  
+  res.json({
+    success: true,
+    token,
+    user: {
+      id: 'user123',
+      name: 'Test User'
+    }
+  });
+});
+
 module.exports = router;

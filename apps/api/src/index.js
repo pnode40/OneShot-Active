@@ -9,7 +9,7 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 3001; // API on 3001, avoid conflicts
+const PORT = process.env.PORT || 5000; // Use port 5000 - completely clean port
 
 // Security middleware
 app.use(helmet({
