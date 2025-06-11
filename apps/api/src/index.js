@@ -1,5 +1,5 @@
-require('express-async-errors'); // Must be first import
-require('dotenv').config();
+require('dotenv').config(); // Must be first import
+require('express-async-errors');
 
 const express = require('express');
 const cors = require('cors');
@@ -9,7 +9,7 @@ const rateLimit = require('express-rate-limit');
 
 
 const app = express();
-const PORT = process.env.PORT || 5000; // Use port 5000 - completely clean port
+const PORT = process.env.PORT || 5001; // Default to 5001 per environment setup
 
 // Security middleware
 app.use(helmet({
