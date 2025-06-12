@@ -86,7 +86,7 @@ export default function APITestPage() {
         graduationYear: formData.graduationYear ? parseInt(formData.graduationYear.toString()) : 2024
       };
 
-      const response = await fetch('http://localhost:5000/api/profiles', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/profiles`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -110,7 +110,7 @@ export default function APITestPage() {
   const generateQRCode = async (profileId: string) => {
     setQrLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/profiles/${profileId}/qr`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/profiles/${profileId}/qr`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -336,7 +336,7 @@ export default function APITestPage() {
                       Test Link →
                     </a>
                     <a 
-                      href={`http://localhost:5000${qrCode.qrCode.downloadUrl}`}
+                      href={`${process.env.NEXT_PUBLIC_API_URL}${qrCode.qrCode.downloadUrl}`}
                       download
                       className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition"
                     >
@@ -354,7 +354,7 @@ export default function APITestPage() {
           <div className="text-sm text-gray-600 space-y-2">
             <h3 className="font-medium">API Reference:</h3>
             <p><strong>Endpoint:</strong> POST /api/profiles</p>
-            <p><strong>Base URL:</strong> http://localhost:5000</p>
+            <p><strong>Base URL:</strong> {process.env.NEXT_PUBLIC_API_URL}</p>
             <p><strong>Expected Response:</strong> Profile object with ID</p>
             
             <div className="mt-4 pt-4 border-t border-gray-300">
