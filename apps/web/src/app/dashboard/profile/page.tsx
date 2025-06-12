@@ -95,8 +95,47 @@ export default withAuth(function AthleteProfilePage() {
     }
   })
 
-  // Watch public value for UI feedback
-  const isPublic = watch('public')
+  // Watch form fields
+  const watchedFields = watch(['fullName', 'primaryPosition', 'highlightVideoUrl', 'hudlVideoUrl', 'highSchoolName', 'public'])
+  const [fullName, primaryPosition, highlightVideoUrl, hudlVideoUrl, highSchoolName, isPublic] = watchedFields
+
+  // Check profile completeness
+  const isProfileComplete = Boolean(
+    fullName &&
+    primaryPosition &&
+    (highlightVideoUrl || hudlVideoUrl) &&
+    highSchoolName // Optional but included in check
+  )
+
+  // Handle visibility toggle
+  const handleVisibilityChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!user || !token || !profile?.id) return
+
+    const newValue = event.target.checked
+
+    try {
+      const response = await fetch(`http://localhost:5001/api/profiles/${profile.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ public: newValue })
+      })
+
+      if (!response.ok) {
+        // Revert form state on error
+        reset({ ...profile, public: !newValue })
+        throw new Error('Failed to update profile visibility')
+      }
+
+      const updatedProfile = await response.json()
+      setProfile(updatedProfile)
+    } catch (error) {
+      console.error('Error updating profile visibility:', error)
+      alert('Failed to update profile visibility. Please try again.')
+    }
+  }
 
   // Fetch existing profile on component mount
   useEffect(() => {
@@ -271,9 +310,29 @@ export default withAuth(function AthleteProfilePage() {
           {/* Header */}
           <div className="px-6 py-4 border-b border-gray-200">
             <div className="flex justify-between items-center">
-              <h1 className="text-2xl font-bold text-gray-900">
-                {isEditMode ? 'Edit Your Profile' : 'Create Your Profile'}
-              </h1>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">
+                  {isEditMode ? 'Edit Your Profile' : 'Create Your Profile'}
+                </h1>
+                {/* Completeness Indicator */}
+                <div className="mt-2">
+                  {isProfileComplete ? (
+                    <div className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-green-100 text-green-800">
+                      <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                      Profile complete – ready for recruiters
+                    </div>
+                  ) : (
+                    <div className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-yellow-100 text-yellow-800">
+                      <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                      </svg>
+                      Profile incomplete – missing key information
+                    </div>
+                  )}
+                </div>
+              </div>
               
               {/* Public/Private Toggle */}
               <div className="flex items-center space-x-3">
@@ -284,6 +343,7 @@ export default withAuth(function AthleteProfilePage() {
                   <input
                     type="checkbox"
                     {...register('public')}
+                    onChange={handleVisibilityChange}
                     className="sr-only peer"
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
