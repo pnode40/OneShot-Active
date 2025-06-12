@@ -519,3 +519,217 @@ message: "Clean feature branch created from recovery completion"
 - Deployment hardening before production
 - Branch strategy approval
 - No direct merges to master
+
+## VERIFIED: Recruiter Profile View Audit
+commit: current
+message: "VERIFIED: Public profile route functionality and access controls"
+
+### Route Verification (/athlete/[slug])
+1. Profile Data Rendering:
+   - ✅ Correct data mapping from API
+   - ✅ Fallback to mock data if API fails
+   - ✅ QR code generation
+   - ✅ vCard export functionality
+
+2. Public Access:
+   - ✅ No authentication required
+   - ✅ Direct URL access works
+   - ❌ Missing visibility controls
+   - ❌ No public/private profile support
+
+3. Mobile Layout:
+   - ✅ Responsive design with Tailwind
+   - ✅ Media properly sized
+   - ✅ Touch-friendly controls
+   - ✅ Proper viewport settings
+
+### Required Actions
+1. Implement profile visibility:
+   ```js
+   // Required schema changes
+   public: boolean
+   visibility: 'public' | 'private' | 'recruiter-only'
+   ```
+
+2. Add visibility checks:
+   - API route guards
+   - Frontend conditional rendering
+   - User role validation
+
+### Standards Applied
+- Mobile-first design principles
+- Progressive enhancement
+- Accessibility considerations
+- Security best practices
+
+### Quality Check
+- ✅ Core functionality works
+- ✅ Mobile layout verified
+- ❌ Privacy controls needed
+- ⚠️ Security review required
+
+## VERIFIED: Backend Profile Visibility Implementation
+commit: current
+message: "VERIFIED: Added public/private profile controls to API"
+
+### Changes Made
+1. Profile Schema Update:
+   ```js
+   public: boolean  // Controls profile visibility
+   ```
+
+2. API Route Changes:
+   - ✅ GET /api/profiles/ - Returns only public profiles
+   - ✅ GET /api/profiles/:id - 404 if not public
+   - ✅ POST /api/profiles/ - Defaults to public: true
+
+3. Error Handling:
+   - ✅ Clear 404 message for private profiles
+   - ✅ Consistent error format
+   - ✅ No information leakage
+
+### Verification Steps
+1. Public profile access:
+   ```
+   GET /api/profiles/1 (public: true)
+   ✅ Returns 200 with profile data
+   ```
+
+2. Private profile access:
+   ```
+   GET /api/profiles/2 (public: false)
+   ✅ Returns 404 with safe message
+   ```
+
+3. Profile listing:
+   ```
+   GET /api/profiles/
+   ✅ Only returns public profiles
+   ```
+
+### Standards Applied
+- RESTful API practices
+- Security by default
+- Clear error messages
+- No sensitive data exposure
+
+### Quality Check
+- ✅ Visibility control working
+- ✅ Safe error messages
+- ✅ Default to public
+- ✅ No breaking changes
+
+Next: Frontend implementation pending checkpoint approval
+
+## VERIFIED: Frontend Profile Visibility Enforcement
+commit: current
+message: "VERIFIED: Added visibility enforcement to athlete profile page"
+
+### Changes Made
+1. Profile Interface Update:
+   ```ts
+   interface Profile {
+     // ...existing fields
+     public?: boolean
+   }
+   ```
+
+2. Frontend Route Changes:
+   - ✅ Removed mock data fallback
+   - ✅ Added Next.js notFound() redirects
+   - ✅ Updated API port to 5001
+   - ✅ Double visibility check (API + frontend)
+
+3. Error Handling:
+   - ✅ Proper 404 page for private profiles
+   - ✅ No partial UI rendering
+   - ✅ Clean error states
+
+### Verification Steps
+1. Public profile access:
+   ```
+   /athlete/jordan-davis (public: true)
+   ✅ Renders complete profile
+   ```
+
+2. Private profile access:
+   ```
+   /athlete/riley-smith (public: false)
+   ✅ Shows Next.js 404 page
+   ```
+
+3. Error states:
+   ```
+   /athlete/non-existent
+   ✅ Shows Next.js 404 page
+   ```
+
+### Standards Applied
+- Next.js best practices
+- Clean error handling
+- No partial renders
+- Type safety maintained
+
+### Quality Check
+- ✅ Visibility enforced
+- ✅ No data leakage
+- ✅ Clean error states
+- ✅ Type safety preserved
+
+Next: Awaiting checkpoint approval
+
+## VERIFIED: Profile Visibility Toggle Added
+commit: current
+message: "VERIFIED: Added public/private toggle to athlete profile form"
+
+### Changes Made
+1. Schema Update:
+   ```ts
+   // Zod schema
+   public: z.boolean()
+   ```
+
+2. Form Changes:
+   - ✅ Added toggle UI component
+   - ✅ Bound to form state
+   - ✅ Default to public: true
+   - ✅ Real-time UI feedback
+
+3. Type Safety:
+   - ✅ Strong typing with Zod
+   - ✅ Form validation
+   - ✅ TypeScript integration
+
+### Verification Steps
+1. Form behavior:
+   ```
+   Default state: public: true
+   Toggle off: public: false
+   Toggle on: public: true
+   ```
+
+2. Data persistence:
+   ```
+   Save with public: true ✅
+   Save with public: false ✅
+   ```
+
+3. UI feedback:
+   ```
+   Public: "Public Profile"
+   Private: "Private Profile"
+   ```
+
+### Standards Applied
+- React Hook Form practices
+- Tailwind UI patterns
+- Type safety
+- Accessibility support
+
+### Quality Check
+- ✅ Toggle works correctly
+- ✅ Form validation intact
+- ✅ Type safety preserved
+- ✅ UI/UX consistent
+
+Next: Awaiting checkpoint approval

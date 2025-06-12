@@ -41,6 +41,9 @@ const athleteProfileSchema = z.object({
   twitterHandle: z.string().optional(),
   coachName: z.string().optional(),
   coachPhone: z.string().regex(/^\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/, 'Invalid phone number format').optional().or(z.literal('')),
+
+  // Visibility
+  public: z.boolean()
 })
 
 type AthleteProfileForm = z.infer<typeof athleteProfileSchema>
@@ -80,15 +83,20 @@ export default withAuth(function AthleteProfilePage() {
     register,
     handleSubmit,
     formState: { errors },
-    reset
+    reset,
+    watch
   } = useForm<AthleteProfileForm>({
     resolver: zodResolver(athleteProfileSchema),
     defaultValues: {
       weight: 0,
       gpa: 0,
       graduationYear: new Date().getFullYear() + 1,
+      public: true
     }
   })
+
+  // Watch public value for UI feedback
+  const isPublic = watch('public')
 
   // Fetch existing profile on component mount
   useEffect(() => {
@@ -262,9 +270,26 @@ export default withAuth(function AthleteProfilePage() {
         <div className="bg-white shadow-lg rounded-lg">
           {/* Header */}
           <div className="px-6 py-4 border-b border-gray-200">
-            <h1 className="text-2xl font-bold text-gray-900">
-              {isEditMode ? 'Edit Your Profile' : 'Create Your Profile'}
-            </h1>
+            <div className="flex justify-between items-center">
+              <h1 className="text-2xl font-bold text-gray-900">
+                {isEditMode ? 'Edit Your Profile' : 'Create Your Profile'}
+              </h1>
+              
+              {/* Public/Private Toggle */}
+              <div className="flex items-center space-x-3">
+                <span className="text-sm text-gray-600">
+                  {isPublic ? 'Public Profile' : 'Private Profile'}
+                </span>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    {...register('public')}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+            </div>
             <p className="text-gray-600 mt-1">
               {isEditMode 
                 ? 'Update your athlete profile information'

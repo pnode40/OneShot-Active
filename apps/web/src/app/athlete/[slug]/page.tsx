@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import QRCode from 'qrcode'
+import { notFound } from 'next/navigation'
 
 interface Profile {
   id: string
@@ -29,6 +30,7 @@ interface Profile {
   transcriptPdf?: string
   highlightVideoUrl?: string
   hudlVideoUrl?: string
+  public?: boolean
   fortyYardDashSeconds?: number
   performanceMetrics?: {
     speedAgility?: {
@@ -57,55 +59,7 @@ interface Profile {
   slug: string
 }
 
-interface ProfileResponse {
-  profile: Profile
-  hasGeneratedHtml: boolean
-  htmlUrl: string | null
-}
 
-// Mock data matching comprehensive-profile.json structure
-const mockProfile: Profile = {
-  id: "jordan-davis",
-  fullName: "Jordan Davis",
-  jerseyNumber: "12",
-  height: "6'2\"",
-  weight: 185,
-  primaryPosition: "Wide Receiver",
-  secondaryPosition: "Safety",
-  highSchoolName: "Lincoln High School",
-  state: "CA",
-  graduationYear: 2025,
-  email: "jordan.davis@example.com",
-  phone: "(555) 123-4567",
-  gpa: 3.8,
-  photo: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=300&fit=crop&crop=face",
-  bio: "Dedicated wide receiver with exceptional route-running ability and reliable hands. Known for clutch performances in high-pressure situations and strong academic achievement.",
-  fortyYardDashSeconds: 4.4,
-  performanceMetrics: {
-    speedAgility: {
-      verticalJump: 32,
-      broadJump: "9'6\"",
-      twentyYardShuttle: 4.32,
-      threeConeDrill: 6.8,
-      fortyYardDash: 4.4
-    },
-    strength: {
-      benchPress: 225,
-      squat: 315,
-      deadlift: 405,
-      powerClean: 185
-    }
-  },
-  highlightVideoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-  hudlVideoUrl: "https://hudl.com/video/example",
-  twitterHandle: "@jordandavis12",
-  coachName: "Coach Mike Thompson",
-  coachPhone: "(555) 987-6543",
-  transcriptPdf: "/uploads/transcripts/jordan-davis-transcript.pdf",
-  userId: "1",
-  createdAt: new Date().toISOString(),
-  slug: "jordan-davis"
-}
 
 export default function AthletePage({ params }: { params: Promise<{ slug: string }> }) {
   return <AthletePageClientWrapper params={params} />
@@ -141,33 +95,24 @@ function AthletePageClient({ slug }: { slug: string }) {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        // Try to fetch from API first
-        try {
-          const res = await fetch(`http://localhost:5000/api/profiles/${slug}`)
-          
-          if (!res.ok && isNaN(Number(slug))) {
-            const allProfilesRes = await fetch('http://localhost:5000/api/profiles')
-            if (allProfilesRes.ok) {
-              const allData = await allProfilesRes.json()
-              const matchingProfile = allData.profiles.find((p: Profile) => p.slug === slug)
-              if (matchingProfile) {
-                setProfile(matchingProfile)
-                return
-              }
-            }
-          }
-          
-          if (res.ok) {
-            const data: ProfileResponse = await res.json()
-            setProfile(data.profile)
-            return
-          }
-        } catch (apiError) {
-          console.log('API fetch failed, using mock data:', apiError)
-        }
+        // Try to fetch from API
+        const res = await fetch(`http://localhost:5001/api/profiles/${slug}`)
         
-        // Fallback to mock data if API fails
-        setProfile(mockProfile)
+        // If profile is not found or not public, redirect to 404
+        if (!res.ok) {
+          notFound()
+          return
+        }
+
+        const data = await res.json()
+        
+        // If profile exists but isn't public, redirect to 404
+        if (!data.profile || data.profile.public === false) {
+          notFound()
+          return
+        }
+
+        setProfile(data.profile)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred')
         console.error('Error fetching profile:', err)

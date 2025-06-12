@@ -14,7 +14,8 @@ let profiles = [
     graduationYear: 2024,
     userId: 'user123',
     createdAt: '2023-09-01T12:00:00Z',
-    slug: 'jordan-davis'
+    slug: 'jordan-davis',
+    public: true
   },
   {
     id: '2',
@@ -24,7 +25,8 @@ let profiles = [
     graduationYear: 2025,
     userId: 'user456',
     createdAt: '2023-10-15T14:30:00Z',
-    slug: 'riley-smith'
+    slug: 'riley-smith',
+    public: false
   }
 ];
 
@@ -51,13 +53,14 @@ const validateProfileData = data => {
   return { success: errors.length === 0, errors };
 };
 
-// GET all profiles
+// GET all profiles (public only)
 router.get('/', async (req, res) => {
   try {
     // Optional filtering by query parameters
     const { position, school, year } = req.query;
     
-    let filteredProfiles = [...profiles];
+    // Start with public profiles only
+    let filteredProfiles = profiles.filter(p => p.public === true);
     
     if (position) {
       filteredProfiles = filteredProfiles.filter(p => 
@@ -90,15 +93,15 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET profile by ID
+// GET profile by ID (public only)
 router.get('/:id', async (req, res) => {
   try {
     const profile = profiles.find(p => p.id === req.params.id);
     
-    if (!profile) {
+    if (!profile || profile.public !== true) {
       return res.status(404).json({
         error: 'Profile not found',
-        message: `No profile found with ID: ${req.params.id}`
+        message: 'This profile does not exist or is not publicly accessible'
       });
     }
     
@@ -174,7 +177,8 @@ router.post('/', async (req, res) => {
       ...req.body,
       userId: 'test-user', // Hardcoded for testing
       createdAt: new Date().toISOString(),
-      slug
+      slug,
+      public: req.body.public ?? true // Default to public if not specified
     };
     
     // Add to in-memory store
